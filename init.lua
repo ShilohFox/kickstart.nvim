@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -629,9 +629,52 @@ require('lazy').setup({
         -- ts_ls = {},
         --
 
-        tsserver = {},
+        ts_ls = {},
         html = { filetypes = { 'html', 'twig', 'hbs' } },
-        angularls = {},
+        angularls = {
+          filetypes = {
+            'html',
+            'ts',
+            'css',
+          },
+          config = function()
+            local ok, mason_registry = pcall(require, 'mason-registry')
+            if not ok then
+              vim.notify 'mason-registry could not be loaded'
+              return
+            end
+
+            local angularls_path = mason_registry.get_package('angular-language-server'):get_install_path()
+
+            local cmd = {
+              'ngserver',
+              '--stdio',
+              '--tsProbeLocations',
+              table.concat({
+                angularls_path,
+                vim.uv.cwd(),
+              }, ','),
+              '--ngProbeLocations',
+              table.concat({
+                angularls_path .. '/node_modules/@angular/language-server',
+                vim.uv.cwd(),
+              }, ','),
+            }
+
+            local config = {
+              cmd = cmd,
+              on_new_config = function(new_config, new_root_dir)
+                new_config.cmd = cmd
+              end,
+            }
+
+            return config
+          end,
+        },
+
+        somesass_ls = {
+          filetypes = { 'sass', 'scss', 'less', 'css' },
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -797,9 +840,9 @@ require('lazy').setup({
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -853,7 +896,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -906,7 +949,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'angular', 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'typescript', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -936,17 +979,17 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
@@ -972,7 +1015,14 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
+  git = {
+    url_format = 'git@github.com:%s.git',
+  },
 })
+
+for _, config in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
+  config.install_info.url = config.install_info.url:gsub('https://github.com/', 'git@github.com:/')
+end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
