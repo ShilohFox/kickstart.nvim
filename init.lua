@@ -639,6 +639,7 @@ require('lazy').setup({
 
         ts_ls = {},
         html = { filetypes = { 'html', 'twig', 'hbs' } },
+        pyright = {},
         angularls = {
           filetypes = {
             'html',
