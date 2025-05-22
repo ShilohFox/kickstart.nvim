@@ -5,6 +5,9 @@
 
 return {
   {
+    'simrat39/rust-tools.nvim',
+  },
+  {
     'akinsho/toggleterm.nvim',
     version = '*',
     config = true,

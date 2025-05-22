@@ -174,6 +174,8 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+vim.opt.guicursor = ''
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -573,6 +575,12 @@ require('lazy').setup({
               callback = function(event2)
                 vim.lsp.buf.clear_references()
                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+              end,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorHold' }, {
+              callback = function()
+                vim.diagnostic.open_float(nil, { focus = false })
               end,
             })
           end
@@ -1015,14 +1023,14 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
-  git = {
-    url_format = 'git@github.com:%s.git',
-  },
+  --  git = {
+  --    url_format = 'git@github.com:%s.git',
+  --  },
 })
 
-for _, config in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
-  config.install_info.url = config.install_info.url:gsub('https://github.com/', 'git@github.com:/')
-end
+-- for _, config in pairs(require('nvim-treesitter.parsers').get_parser_configs()) do
+--   config.install_info.url = config.install_info.url:gsub('https://github.com/', 'git@github.com:/')
+-- end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
