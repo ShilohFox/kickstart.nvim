@@ -5,6 +5,9 @@
 
 return {
   {
+    'RaafatTurki/hex.nvim',
+  },
+  {
     'simrat39/rust-tools.nvim',
   },
   {
