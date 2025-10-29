@@ -4,12 +4,7 @@
 -- See the kickstart.nvim README for more information
 
 return {
-  {
-    'RaafatTurki/hex.nvim',
-  },
-  {
-    'simrat39/rust-tools.nvim',
-  },
+  'simrat39/rust-tools.nvim',
   {
     'akinsho/toggleterm.nvim',
     version = '*',
